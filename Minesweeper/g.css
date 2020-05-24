@@ -1,0 +1,94 @@
+.game_bg {
+    background-color: gray;
+    width: 500px;
+    height: 560px;
+
+    border: 5px solid;
+    
+}
+.game_header {
+    height: 60px;
+    width: 100%;
+    background-color: green;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    
+}
+
+table {
+    /* 사이 갭 없앰 */
+    width: 100%;
+    height: 500px;
+    border-collapse: collapse;
+}
+td {
+    border: 1px solid black;
+    width: 20px;
+    height: 20px;
+}
+
+.test {
+    background-color: red;
+    /* box-shadow: inset 1px 1px white; */
+    background-image: url("./img/bomb.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 20px;
+    height: 20px;
+    border: solid;
+    /* border-width: 1.5px; */
+    padding: 1.5px;
+    border-top-color: white;
+    border-left-color: white;
+    border-right-color: black;
+    border-bottom-color: black;
+}
+
+
+select {
+    padding: 5px 5px;
+    -webkit-appearance:none; /* 화살표 없애기 for chrome*/
+    -moz-appearance:none; /* 화살표 없애기 for firefox*/
+    appearance:none /* 화살표 없애기 공통*/
+}
+/* IE 10, 11의 네이티브 화살표 숨기기 */ 
+select::-ms-expand {
+    display: none;
+}
+
+.flag_header,
+.timer_header {
+    color: white;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+}
+.imgCenter {
+    /* 이미지 가운데정렬 */
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+.flag_img {
+    background-image: url("./img/flag232.png");
+    width: 30px;
+    height: 30px;
+}
+.timer_img {
+    background-image: url("./img/timer32.png");
+    width: 30px;
+    height: 30px;
+}
+
+.resetBtn {
+    /* border-radius: 10px; */
+    background-color: transparent;
+    border-color: transparent;
+    background-image: url("./img/resetW.png");
+    
+    width: 30px;
+    height: 30px;
+    
+    
+}

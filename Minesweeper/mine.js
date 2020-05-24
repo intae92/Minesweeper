@@ -2,6 +2,7 @@
 //백그라운드 포지션을 sprite로 필요한 부분만 보이게끔
 const execBtn = document.querySelector("#exec");
 const tbody = document.querySelector("#table tbody");
+let stopFlag = false;
 
 
 let HOR, VER, MINE;
@@ -12,9 +13,13 @@ function resetData(){ //데이터셋, 지뢰화면 리셋
     if(tbody.hasChildNodes()){//tbody에 자식노드 있으면 리셋
         tbody.innerHTML = '';
     }
+    stopFlag = false;
 }
 function handleContextMenu(e){//마우스 오른쪽 클릭 물음표
     e.preventDefault();
+    if(stopFlag){
+        return;
+    }
     
     //target, currentTarget 차이?
     //만약에 tbody에 이벤트리스너 달았다면
@@ -25,7 +30,9 @@ function handleContextMenu(e){//마우스 오른쪽 클릭 물음표
     // console.log(e.target)
     // console.log(e.target.parentNode);
     // console.log(e.target.parentNode.parentNode)
-    const row = e.target.id[0], col = e.target.id[1];
+    const idArr = idRowCol(e.target.id);
+    const row = idArr[0], col = idArr[1];
+    // const row = e.target.id[0], col = e.target.id[1];
     
     if(e.target.textContent === '' || e.target.textContent === "X"){
         e.target.textContent = "!"
@@ -57,6 +64,7 @@ function clickZreo(zero, row, col){//지뢰 수 0 클릭시 주변 오픈
                     if(tbody.childNodes[row+i].childNodes[col+j].textContent === ''){
                         tbody.childNodes[row+i].childNodes[col+j].textContent = dataset[row+i][col+j];
                         if(dataset[row+i][col+j] === 0){
+                            
                             clickZreo(dataset[row+i][col+j], row+i, col+j);
                         }
                     }
@@ -72,14 +80,25 @@ function clickZreo(zero, row, col){//지뢰 수 0 클릭시 주변 오픈
         }
     }
 }
+function idRowCol(strId){//문자열형태의 id를 원하는 형태, 숫자인 row와 col로 바꿈
+    return strId.split(',').map(v => Number(v));
+}
 function handleClick(e){
     e.preventDefault();
-    const row = Number(e.target.id[0]), col = Number(e.target.id[1]);
+    if(stopFlag){
+        return;
+    }
+ 
+    const idArr = idRowCol(e.target.id);
+    const row = idArr[0], col = idArr[1];
+    // const row = Number(e.target.id[0]), col = Number(e.target.id[1]);
     
     if(dataset[row][col] === "X"){
         e.target.textContent = '펑';
+        stopFlag = true; //클릭 안되게 함
     } else {
-        // console.log(dataset)
+        console.log(dataset)
+        console.log(typeof(dataset[row][col]))
         e.target.textContent = dataset[row][col];
         // const r = e.target.parentNode.parentNode.childNodes;
         // const c = e.target.parentNode.childNodes;
@@ -108,6 +127,7 @@ function handleClick(e){
 
         clickZreo(dataset[row][col], row, col);//지뢰 수 0 클릭시 주변 오픈
     }
+    // console.log(dataset)
 }
 
 function createMineTable(hor, ver){//지뢰찾기 테이블 만들기
@@ -121,7 +141,7 @@ function createMineTable(hor, ver){//지뢰찾기 테이블 만들기
             let td = document.createElement("td");
             td.addEventListener("contextmenu", handleContextMenu);//마우스 오른쪽 클릭시 물음표
             td.addEventListener("click", handleClick);
-            td.id = i+''+j+'';//table에서 td 좌표 알기 위해 id설정
+            td.id = i+''+','+j+'';//table에서 td 좌표 알기 위해 id설정
             tr.appendChild(td);
             // td.textContent = 1;
         }
@@ -130,7 +150,7 @@ function createMineTable(hor, ver){//지뢰찾기 테이블 만들기
         
     }
     // console.log(tbody);
-    console.log(dataset);
+    
 }
 
 function randomMinesPosition(hor, ver, mine){//지뢰 위치 뽑기
@@ -138,23 +158,28 @@ function randomMinesPosition(hor, ver, mine){//지뢰 위치 뽑기
     //     return idx;
     // });
     const minesArr = [];
+    
     for(let i =0; i<ver; i++){//세로
         for(let j=0; j<hor; j++){//가로
-            minesArr.push(Number(String(i)+String(j)));
+            // minesArr.push(Number(String(i)+String(j)));
+            minesArr.push(String(i) + ',' + String(j));
         }
     }
+    // console.log(minesArr)
     let arrShuffle = [];//배열 섞기
     while(minesArr.length > hor*ver - mine){
         let temp = minesArr.splice(Math.floor(Math.random() * minesArr.length), 1)[0];
         // console.log(temp)
         arrShuffle.push(temp);
     }
+    
     // console.log(arrShuffle)
     return arrShuffle;
 }
 
 function countMines(row, col){//지뢰숫자 세기
     // console.log(HOR, VER)
+    // console.log(row, col)
     for(let i=-1; i<2; i++){
         for(let j=-1; j<2; j++){
             // console.log(row, col)
@@ -166,6 +191,7 @@ function countMines(row, col){//지뢰숫자 세기
             }
         }
     }
+    // console.log(dataset)
     // let count = [
     // dataset[row-1][col-1], dataset[row-1][col], dataset[row-1][col+1],
     // dataset[row][col-1], dataset[row][col], dataset[row][col+1],
@@ -176,12 +202,16 @@ function countMines(row, col){//지뢰숫자 세기
 function planingMines(hor, ver, mine){//지뢰심기
     const minesPosition = randomMinesPosition(hor, ver, mine);//지뢰 위치 뽑기
     for(let k = 0; k<minesPosition.length; k++){
-        let mineVer = Math.floor(minesPosition[k] / 10);//세로
-        let mineHor = minesPosition[k] % 10;//가로
+        let arr = minesPosition[k].split(',').map(v => Number(v));
+        // let mineVer = Math.floor(minesPosition[k] / 10);//세로
+        let mineVer = arr[0];
+        let mineHor = arr[1];
+        
+        // let mineHor = minesPosition[k] % 10;//가로
         tbody.children[mineVer].children[mineHor].textContent = "X";
         // tbody.children[mineVer].children[mineHor].textContent = mineVer+''+mineHor+'';
         dataset[mineVer][mineHor]  = "X";
-
+        
         countMines(mineVer, mineHor);
     }
 
@@ -198,6 +228,14 @@ function execClick(e){//실행 버튼 클릭시
     planingMines(HOR, VER, MINE);//지뢰 심기
 
 }
+
+
+// function paintImage(imgNumber){
+//     const image = new Image();
+//     image.src = `../assets/images/bg${imgNumber + 1}.jpg`;
+//     image.classList.add("bgImage");
+//     body.prepend(image);
+// }
 
 function init(){
     execBtn.addEventListener("click", execClick);//실행 버튼 클릭시
