@@ -3,9 +3,11 @@
 const execBtn = document.querySelector("#exec");
 const tbody = document.querySelector("#table > tbody");
 let stopFlag = false;
+let stopClassListRemove = true;
 //지뢰찾기 theat tr 반응형으로 가로 크기 변하게 하기 위해서
 const table = document.querySelector("table")
 const theadTr = table.children[0].children[0];
+
 
 let HOR, VER, MINE;
 let dataset = [];//지뢰찾기 데이터
@@ -16,6 +18,7 @@ function resetData(){ //데이터셋, 지뢰화면 리셋
         tbody.innerHTML = '';
     }
     stopFlag = false;
+    stopClassListRemove = true;
 }
 function handleContextMenu(e){//마우스 오른쪽 클릭 물음표
     e.preventDefault();
@@ -91,8 +94,15 @@ function idRowCol(strId){//문자열형태의 id를 원하는 형태, 숫자인 
 }
 function handleClick(e){
     // e.preventDefault();
+    // console.log(e.target)
+    
     if(stopFlag){
+        stopClassListRemove = false;
         return;
+    }
+
+    if(stopClassListRemove){
+        e.target.classList.remove("tdDiv");
     }
     let row, col;
     let idArr = idRowCol(e.target.parentNode.id);
@@ -162,7 +172,9 @@ function createMineTable(hor, ver){//지뢰찾기 테이블 만들기
             arr.push(0);
             let td = document.createElement("td");
             const tdDiv = document.createElement("div");//td 최소크기 설정하기 위해
-            tdDiv.id = "tdDiv";
+            // tdDiv.id = "tdDiv";
+            tdDiv.classList.add("tdDiv")
+
             td.appendChild(tdDiv);
 
             td.addEventListener("contextmenu", handleContextMenu);//마우스 오른쪽 클릭시 물음표
@@ -258,6 +270,7 @@ function theadAddDiv(){//thead에 깃발수 시간 이모티콘 넣기 위해
 
 }
 
+
 function execClick(e){//실행 버튼 클릭시
     // e.preventDefault();
     // HOR = parseInt(document.querySelector("#hor").value);//가로
@@ -274,6 +287,7 @@ function execClick(e){//실행 버튼 클릭시
 
     createMineTable(HOR, VER);//지뢰찾기 테이블 만들기
     planingMines(HOR, VER, MINE);//지뢰 심기
+    
 
 }
 

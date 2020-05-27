@@ -7,34 +7,50 @@ body {
 
 table {
     /* 사이 갭 없앰 */
-    /* border-collapse: collapse; */
-
-    border: 3px solid;
-    padding: 5px;
+    border-collapse: collapse;
     text-align: center; /* 글씨 가운데 정렬 */
-    /* vertical-align: middle; */
-    border-top-color: white;
-    border-left-color: white;
-    border-right-color: #0984e3;
-    border-bottom-color: #0984e3;
     background-color: #b2bec3;
 }
-
-th {
-    border: 3px solid;
-    height: 40px;
-    border-top-color:  #0984e3;
-    border-left-color:  #0984e3;
+tbody {
+    border: 2px solid;
+    border-top-color: #54a0ff;
+    border-left-color: #54a0ff;
     border-right-color: white;
     border-bottom-color: white;
+}
+
+#game-container {
+    border: 3px solid;
     
-    /* border-bottom-width: 5px;
-    border-bottom-color: #0984e3; */
+    border-top-color: white;
+    border-left-color: white;
+    border-right-color: #54a0ff;
+    border-bottom-color: #54a0ff;
+}
+#game-board {
+    border: 10px solid;
+    border-color: #b2bec3;  
+}
+
+#theadDiv {
+    min-height: 50px;
+}
+th {
+    height: 60px;
+    padding-bottom: 10px;
 }
 
 
 th > div {
-    width: 100%;
+    border: 3px solid;
+    
+    height: 40px;
+    border-top-color:  #54a0ff;
+    border-left-color:  #54a0ff;
+    border-right-color: white;
+    border-bottom-color: white;
+
+    width: auto;
     height: 100%;
     
     display: flex;
@@ -42,28 +58,38 @@ th > div {
     align-items: center;
 }
 th > div > div {
-    margin: 10px;
-    width: 20%;
+    margin: 8px;
+}
+th > div > div:nth-child(1){
+    background-color: #0097e6;
+    width: 30%;
     height: 100%;
-    background-color: #ffeaa7;
 }
-#theadDiv {
-    min-height: 50px;
+th > div > div:nth-child(2){
+    /* background-color: #ffeaa7; */
+    width: 20%;
+    height: 70%;
+    background-image: url("./img/normalEmotion.png");
+    background-position: center;
+    background-repeat: no-repeat;
 }
+th > div > div:nth-child(3){
+    background-color: #273c75;
+    width: 30%;
+    height: 100%;
+}
+
 td {
-    border: 1px solid black;
-    /* width: 20px;
-    height: 20px; */
-    border: 2px solid;
-    /* padding: 5px; */
-    
-    border-top-color: white;
-    border-left-color: white;
-    border-right-color: #0984e3;
-    border-bottom-color: #0984e3;
+    border: 0.3px solid #54a0ff;
 }
-#tdDiv {
+.tdDiv {
     /* 화면 줄였을 때 지뢰판 안 깨지게 설정 */
     min-width: 20px;
     min-height: 20px;
+
+    border: 2px solid;
+    border-top-color: white;
+    border-left-color: white;
+    border-right-color: #54a0ff;
+    border-bottom-color: #54a0ff;
 }
