@@ -2,13 +2,20 @@
 //백그라운드 포지션을 sprite로 필요한 부분만 보이게끔
 const execBtn = document.querySelector("#exec");
 const tbody = document.querySelector("#table > tbody");
-let stopFlag = false;
+let stopFlag = false; //지뢰 밟으면 펑일때
 let stopClassListRemove = true;
+let tdDivClicked = false; //마우스로 누르고 td범위 나가면 테두리 원상복귀 시키기 위한 flag
+// let rightClicked = true; //오른쪽 마우스 클릭시 테두리 변화 안주기 위해서
+let cliceStart = false; //마우스 클릭후 move 이벤트 실행 시키기위해
+
 //지뢰찾기 theat tr 반응형으로 가로 크기 변하게 하기 위해서
 const table = document.querySelector("table")
 const theadTr = table.children[0].children[0];
 
-
+//donw downRighted handleRightClick mouseup-handleLeftClick
+//donw handleRightClick mouseup-handleLeftClick
+//down handleRightClick mouseup-handleLeftClick mouseupRighted
+//donw downRighted handleRightClick mouseup-handleLeftClick mouseupRighted
 let HOR, VER, MINE;
 let dataset = [];//지뢰찾기 데이터
 
@@ -20,53 +27,37 @@ function resetData(){ //데이터셋, 지뢰화면 리셋
     stopFlag = false;
     stopClassListRemove = true;
 }
-function handleContextMenu(e){//마우스 오른쪽 클릭 물음표
+
+function rightClickedContext(text){ //오른쪽 클릭 된 ! ? 변화 안되게
+    if(text === "!" || text === "?"){
+        return true;
+    }else {
+        return false;
+    }
+}
+let rightClicked = true;//오른쪽 버튼 누리고 마우스 이벤트 구현 안되게 하기위해서
+function handleRightClick(e){//마우스 오른쪽 클릭 물음표
+    // console.log("handleRightClick");
+    console.log(e.target);
+    console.dir(e.target);
     e.preventDefault();
     if(stopFlag){
         return;
     }
-    
-    //target, currentTarget 차이?
-    //만약에 tbody에 이벤트리스너 달았다면
-    //currentTarget 이벤트 리스너가 달린얘 td클릭하면 tbody
-    //target 실제 이벤트가 발생한 얘 td클릭하면 td
-
-    // console.dir(e.currentTarget.children.HTMLCollection.item());
-    // console.log(e.target)
-    // console.log(e.target.parentNode);
-    // console.log(e.target.parentNode.parentNode)
-
-    // const idArr = idRowCol(e.target.parentNode.id);
-    // const row = idArr[0], col = idArr[1];
-
-    // const row = e.target.id[0], col = e.target.id[1];
-    // console.log(e.target)
+    e.target.classList.add("tdDivDefaultBorder");
+    rightClicked = false;//오른쪽 버튼 누리고 마우스 이벤트 구현 안되게 하기위해서
     if(e.target.textContent === ''){
-    // if(e.target.textContent === '' || e.target.textContent === "X"){
         e.target.textContent = "!"
     } else if(e.target.textContent === "!"){
         e.target.textContent = "?"
     } else if(e.target.textContent === "?"){
         e.target.textContent = "";
-        // if(dataset[row][col] !== "X"){
-        //     e.target.textContent = "";
-        // } else {
-        //     e.target.textContent = "X";
-        // }
-    }
+    }    
+
 }
+
 function clickZreo(zero, row, col){//지뢰 수 0 클릭시 주변 오픈
     if(zero === 0){
-        // tbody.childNodes[row-1].childNodes[col-1].textContent = dataset[row-1][col-1];
-        // tbody.childNodes[row-1].childNodes[col].textContent = dataset[row-1][col];
-        // tbody.childNodes[row-1].childNodes[col+1].textContent = dataset[row-1][col+1];
-        // tbody.childNodes[row].childNodes[col-1].textContent = dataset[row][col-1];
-        // // tbody.childNodes[row].childNodes[col].textContent = dataset[row][col];
-        // tbody.childNodes[row].childNodes[col+1].textContent = dataset[row][col+1];
-        // tbody.childNodes[row+1].childNodes[col-1].textContent = dataset[row+1][col-1];
-        // tbody.childNodes[row+1].childNodes[col].textContent = dataset[row+1][col];
-        // tbody.childNodes[row+1].childNodes[col+1].textContent = dataset[row+1][col+1];
-        
         for(let i=-1; i<2; i++){
             for(let j=-1; j<2; j++){
                 if(row+i >=0 && col+j>=0 && row+i < VER && col+j < HOR){
@@ -79,12 +70,6 @@ function clickZreo(zero, row, col){//지뢰 수 0 클릭시 주변 오픈
                     }
                     
                 }
-                // if(row+i >=0 && col+j>=0 && row+i < VER && col+j < HOR){
-                //     if(dataset[row+i][col+j]!=="X"){
-                //         dataset[row+i][col+j]++;
-                //         // console.log(dataset[row+i][col+j]);
-                //     }
-                // }
             }
         }
     }
@@ -92,76 +77,110 @@ function clickZreo(zero, row, col){//지뢰 수 0 클릭시 주변 오픈
 function idRowCol(strId){//문자열형태의 id를 원하는 형태, 숫자인 row와 col로 바꿈
     return strId.split(',').map(v => Number(v));
 }
-function handleClick(e){
-    // e.preventDefault();
-    // console.log(e.target)
-    
-    if(stopFlag){
-        stopClassListRemove = false;
+function handleLeftClick(e){//mouseup
+    console.log('mouseup handleLeftClick')
+    console.log(e.target);
+    if(rightClickedContext(e.target.textContent)){//오른쪽 클릭 된 ! ? 변화 안되게
         return;
     }
-
-    if(stopClassListRemove){
-        e.target.classList.remove("tdDiv");
-    }
-    let row, col;
-    let idArr = idRowCol(e.target.parentNode.id);
-    if(idArr.length === 1){//가끔 div가 비어 있는 버그 해결책
-        idArr = idRowCol(e.target.id)
-        row = idArr[0];
-        col = idArr[1];
-    } else {
-        row = idArr[0];
-        col = idArr[1];
-    }
-
-
-    // const row = Number(e.target.id[0]), col = Number(e.target.id[1]);
-    // console.dir(e.target.parentNode)
-    // console.log(typeof(row), col)
-    // console.log(dataset)
-
-    if(e.target.textContent === ''){
-        if(dataset[row][col] === "X"){
+    if(rightClicked){//오른쪽 버튼 누리고 마우스 이벤트 구현 안되게 하기위해서
+        console.log('mouseupRighted')
+        mouseDowning = false;
         
-            e.target.textContent = '펑';
-            stopFlag = true; //클릭 안되게 함
-        } else {
-            // console.log(dataset)
-            // console.log(typeof(dataset[row][col]))
-            e.target.textContent = dataset[row][col];
-            // const r = e.target.parentNode.parentNode.childNodes;
-            // const c = e.target.parentNode.childNodes;
-            
-            // console.log(tbody.childNodes[row-1].childNodes[col-1]);
-            // e.target.parentNode.parentNode.childNodes[row-1].childNodes[col-1].textContent = dataset[row-1][col-1];
-            // console.log(e.target.parentNode.parentNode.childNodes[row-1].childNodes[col-1]);
-            // console.log(e.target.parentNode.parentNode.childNodes[row-1].childNodes[col]);
-            // console.log(e.target.parentNode.parentNode.childNodes[row-1].childNodes[col+1]);
-            // console.log(e.target.parentNode.parentNode.childNodes[row].childNodes[col-1]);
-            // console.log(e.target.parentNode.parentNode.childNodes[row].childNodes[col]);
-            // console.log(e.target.parentNode.parentNode.childNodes[row].childNodes[col+1]);
-            // console.log(e.target.parentNode.parentNode.childNodes[row+1].childNodes[col-1]);
-            // console.log(e.target.parentNode.parentNode.childNodes[row+1].childNodes[col]);
-            // console.log(e.target.parentNode.parentNode.childNodes[row+1].childNodes[col+1]);
-           
-            // tbody.childNodes[row-1].childNodes[col-1].textContent = dataset[row-1][col-1];
-            // tbody.childNodes[row-1].childNodes[col].textContent = dataset[row-1][col];
-            // tbody.childNodes[row-1].childNodes[col+1].textContent = dataset[row-1][col+1];
-            // tbody.childNodes[row].childNodes[col-1].textContent = dataset[row][col-1];
-            // // tbody.childNodes[row].childNodes[col].textContent = dataset[row][col];
-            // tbody.childNodes[row].childNodes[col+1].textContent = dataset[row][col+1];
-            // tbody.childNodes[row+1].childNodes[col-1].textContent = dataset[row+1][col-1];
-            // tbody.childNodes[row+1].childNodes[col].textContent = dataset[row+1][col];
-            // tbody.childNodes[row+1].childNodes[col+1].textContent = dataset[row+1][col+1];
-    
-            clickZreo(dataset[row][col], row, col);//지뢰 수 0 클릭시 주변 오픈
+        if(stopFlag){
+            stopClassListRemove = false;
+            return;
         }
-        // console.log(dataset)
+    
+        e.target.classList.add("clicked");
+    
+        tdDivClicked = true; //마우스로 누르고 td범위 나가면 테두리 원상복귀 시키기 위한 flag
+        if(stopClassListRemove){
+            e.target.classList.remove("tdDivDefaultBorder");
+        }
+        let row, col;
+        
+        let idArr = idRowCol(e.target.parentNode.id);
+        if(idArr.length === 1){//가끔 div가 비어 있는 버그 해결책
+            idArr = idRowCol(e.target.id)
+            row = idArr[0];
+            col = idArr[1];
+        } else {
+            row = idArr[0];
+            col = idArr[1];
+        }
+        if(e.target.textContent === ''){
+            if(dataset[row][col] === "X"){
+            
+                e.target.textContent = '펑';
+                stopFlag = true; //클릭 안되게 함
+            } else {
+                e.target.textContent = dataset[row][col];
+                clickZreo(dataset[row][col], row, col);//지뢰 수 0 클릭시 주변 오픈
+            }
+        }
     }
+   
     
 }
+let mouseDowning = false; //마우스 누르고 있는중
+function tdDivMouseDown(e){//마우스 누를때 테두리 변화
+    // console.log('donw')
+    if(rightClickedContext(e.target.textContent)){//오른쪽 클릭 된 ! ? 변화 안되게
+        return;
+    }
+    rightClicked = true;//오른쪽 버튼 누리고 마우스 이벤트 구현 안되게 하기위해서
+    // console.log('downRighted')
+    mouseDowning = true;
+    if(stopFlag){
+        return;
+    }
+    e.target.classList.remove("tdDivDefaultBorder");
+   
+}
 
+function tdDivMouseOut(e){
+    // console.log('tdDivMouseOut')
+    if(rightClickedContext(e.target.textContent)){//오른쪽 클릭 된 ! ? 변화 안되게
+        return;
+    }
+    
+    // console.log('tdDivMouseOutRighted')
+    if(stopFlag){
+        return;
+    }
+    if(!e.target.classList.contains("clicked")){
+        e.target.classList.add("tdDivDefaultBorder");
+    }
+    if(tdDivClicked){
+        e.target.classList.remove("tdDivDefaultBorder");
+    }
+    tdDivClicked = false;
+
+}
+function tdDivMouseMove(e){
+    // console.log('tdDivMouseMove')
+    if(rightClickedContext(e.target.textContent)){//오른쪽 클릭 된 ! ? 변화 안되게
+        return;
+    }
+    if(rightClicked){//마우스 오른쪽 누르면 마우스이벤트 구현 안되게 하기 위해서
+         // console.log('tdDivMouseMoveRighted')
+    if(stopFlag){
+        return;
+    }
+    if(mouseDowning){
+        if(e.target.classList.contains("clicked")){
+            return;
+        }
+        e.target.classList.remove("tdDivDefaultBorder");
+    }
+    }
+   
+}
+//mousedown 클릭의 앞
+//mouseout 요소 밖으로 벗어남
+//mousemove 마우스 움직임
+//mouseup 클릭의 뒤 
 function createMineTable(hor, ver){//지뢰찾기 테이블 만들기
     resetData();//데이터셋, 지뢰화면 리셋 다시 실행 할때 아무것도 없게 하기 위해
 
@@ -172,14 +191,21 @@ function createMineTable(hor, ver){//지뢰찾기 테이블 만들기
             arr.push(0);
             let td = document.createElement("td");
             const tdDiv = document.createElement("div");//td 최소크기 설정하기 위해
-            // tdDiv.id = "tdDiv";
-            tdDiv.classList.add("tdDiv")
+            
+            tdDiv.classList.add("tdDivDefault");
+            tdDiv.classList.add("tdDivDefaultBorder");
+            tdDiv.addEventListener("contextmenu", handleRightClick);//마우스 오른쪽 클릭시 물음표
+            tdDiv.addEventListener("mousedown", tdDivMouseDown);//마우스 누를때 테두리 변화
+            tdDiv.addEventListener("mouseout", tdDivMouseOut);//마우스 누르고 박스 밖으로 움직일때
+            tdDiv.addEventListener("mousemove", tdDivMouseMove);
+            
+            
 
             td.appendChild(tdDiv);
 
-            td.addEventListener("contextmenu", handleContextMenu);//마우스 오른쪽 클릭시 물음표
-            td.addEventListener("click", handleClick);
-
+            // td.addEventListener("contextmenu", handleRightClick);//마우스 오른쪽 클릭시 물음표
+            td.addEventListener("mouseup", handleLeftClick);
+            
             td.id = i+''+','+j+'';//table에서 td 좌표 알기 위해 id설정
             
             tr.appendChild(td);
@@ -231,12 +257,6 @@ function countMines(row, col){//지뢰숫자 세기
             }
         }
     }
-    // console.log(dataset)
-    // let count = [
-    // dataset[row-1][col-1], dataset[row-1][col], dataset[row-1][col+1],
-    // dataset[row][col-1], dataset[row][col], dataset[row][col+1],
-    // dataset[row+1][col-1], dataset[row+1][col], dataset[row+1][col+1]
-    // ]
 }
 
 function planingMines(hor, ver, mine){//지뢰심기
@@ -246,21 +266,28 @@ function planingMines(hor, ver, mine){//지뢰심기
         // let mineVer = Math.floor(minesPosition[k] / 10);//세로
         let mineVer = arr[0];
         let mineHor = arr[1];
-        
-        // let mineHor = minesPosition[k] % 10;//가로
-        // tbody.childNodes[mineVer].childNodes[mineHor].textContent = "X";
-        // tbody.children[mineVer].children[mineHor].textContent = "X";
-        // tbody.children[mineVer].children[mineHor].textContent = mineVer+''+mineHor+'';
         dataset[mineVer][mineHor]  = "X";
         
         countMines(mineVer, mineHor);
     }
 }
+function emotionClickMouseDown(e){
+    e.target.classList.add("emotionMouseDown");
+}
+function emotionClickMouseUp(e){
+    e.target.classList.remove("emotionMouseDown");
+    e.target.classList.add("emotionDefaultBorder");
+    
+}
+
+function emotionClick(e){
+    execClick();//리셋하기
+}
 function theadAddDiv(){//thead에 깃발수 시간 이모티콘 넣기 위해
-    console.dir(theadTr)
+    // console.dir(theadTr)
     const theadTh = theadTr.children[0];
-    console.log(theadTh);
-    console.dir(theadTh);
+    // console.log(theadTh);
+    // console.dir(theadTh);
     const theadThContainer = document.createElement("div");
     const flagDiv = document.createElement("div");
     const emotionDiv = document.createElement("div");
@@ -268,18 +295,23 @@ function theadAddDiv(){//thead에 깃발수 시간 이모티콘 넣기 위해
     theadThContainer.append(flagDiv, emotionDiv, timerDiv);
     theadTh.append(theadThContainer);
 
+    emotionDiv.classList.add("emotionDefaultBorder");
+    emotionDiv.addEventListener("click", emotionClick);//이모티콘 클릭
+    emotionDiv.addEventListener("mousedown", emotionClickMouseDown);//이모티콘 마우스로 누를때
+    emotionDiv.addEventListener("mouseout", emotionClickMouseUp);
+    // console.log(emotionDiv);
 }
 
-
+const board = document.querySelector("#game-board");
 function execClick(e){//실행 버튼 클릭시
     // e.preventDefault();
-    // HOR = parseInt(document.querySelector("#hor").value);//가로
-    // VER = parseInt(document.querySelector("#ver").value);//세로
-    // MINE = parseInt(document.querySelector("#mine").value);
+    HOR = parseInt(document.querySelector("#hor").value);//가로
+    VER = parseInt(document.querySelector("#ver").value);//세로
+    MINE = parseInt(document.querySelector("#mine").value);
     
-    HOR = 10;
-    VER = 10;
-    MINE = 20;
+    // HOR = 10;
+    // VER = 10;
+    // MINE = 20;
     // theadTr.innerHTML = "<th colspan=" + `${HOR}`+ "></th>";
     theadTr.innerHTML = "<th colspan=" + HOR+ "></th>";
     theadAddDiv();//thead에 깃발수 시간 이모티콘 넣기 위해
@@ -287,6 +319,16 @@ function execClick(e){//실행 버튼 클릭시
 
     createMineTable(HOR, VER);//지뢰찾기 테이블 만들기
     planingMines(HOR, VER, MINE);//지뢰 심기
+
+    let boardWidth = board.clientWidth + board.clientTop + board.clientLeft+11;//게임판 Width 크기 고정 시키기 위해서
+    let boardHeight = board.clientHeight + board.clientTop + board.clientLeft;
+    console.dir(board)
+    console.log(board.clientHeight)
+    console.log(board.clientLeft)
+    console.log(board.clientTop)
+    console.log(board.clientWidth)
+    console.log(boardWidth);
+    console.log(boardHeight);
     
 
 }
@@ -300,8 +342,9 @@ function execClick(e){//실행 버튼 클릭시
 // }
 
 function init(){
-    // execBtn.addEventListener("click", execClick);//실행 버튼 클릭시
-    execClick();
+    execBtn.addEventListener("click", execClick);//실행 버튼 클릭시
+    // execClick();
+    
     
 }
 init();
