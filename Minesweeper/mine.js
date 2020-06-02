@@ -15,6 +15,12 @@ const victory_btn = document.querySelector("#victory_btn");
 const game_hidden = document.querySelector(".game_hidden");
 const head = document.querySelector(".head");
 
+const color ={
+    '1': "#ff6b81",
+    '2': "#f6e58d",
+    '3': "#7bed9f",
+    '4': "#3742fa"
+};
 let HOR, VER, MINE;
 let dataset = [];//지뢰찾기 데이터
 
@@ -78,7 +84,9 @@ function handleRightClick(e){//마우스 오른쪽 클릭 물음표
         flagText.textContent = '000';
     }
 }
-
+function colorObj(num){
+    return color[num];
+}
 function clickZreo(zero, row, col){//지뢰 수 0 클릭시 주변 오픈
     if(zero === 0){
         for(let i=-1; i<2; i++){
@@ -88,6 +96,7 @@ function clickZreo(zero, row, col){//지뢰 수 0 클릭시 주변 오픈
                     && !tbody.children[row+i].children[col+j].children[0].classList.contains("questionImage") 
                     && !tbody.children[row+i].children[col+j].children[0].classList.contains("clicked")){
                         tbody.children[row+i].children[col+j].children[0].textContent = dataset[row+i][col+j] === 0 ? '' : dataset[row+i][col+j];
+                        tbody.children[row+i].children[col+j].children[0].style.color = colorObj(dataset[row+i][col+j]);
                         tbody.children[row+i].children[col+j].children[0].classList.add("clicked");
                         tbody.children[row+i].children[col+j].children[0].classList.remove("tdDivDefaultBorder");
                         if(dataset[row+i][col+j] === 0){
@@ -172,6 +181,7 @@ function handleLeftClick(e){//mouseup
                 stopFlag = true; //클릭 안되게 함
             } else {
                 e.target.textContent = dataset[row][col] === 0 ? '' : dataset[row][col];
+                e.target.style.color = colorObj(dataset[row][col]);
                 clickZreo(dataset[row][col], row, col);//지뢰 수 0 클릭시 주변 오픈
             }
         }

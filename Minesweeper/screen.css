@@ -149,8 +149,9 @@ th > div > div > span {
 
 td {
     border: 0.3px solid #54a0ff;
-    /* color: #54a0ff;
-    font-size: large; */
+    color: #54a0ff;
+    font-size: large;
+    font-weight: 900;
 }
 .tdDivDefault {
     /* 화면 줄였을 때 지뢰판 안 깨지게 설정 */
